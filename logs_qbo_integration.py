@@ -1,0 +1,433 @@
+import pandas as pd
+import json
+import numpy as np
+import requests
+import streamlit as st
+import datetime as dt
+from accounting_service_payments_applications import get_bearer_token,create_headers
+
+
+st.set_page_config('Accounting Services - QBO',
+                    page_icon= ':factory:',
+                    layout= 'wide'
+                    )
+
+st.title(':orange[AS - QBO] Automation Service :factory:')
+
+
+def logs_AS_transactios(startDate,endDate,headers):
+    json_data = {
+        'operationName': 'getAccountingAPIFetchJournalsForDates',
+        'variables': {
+            'input': {
+                        'startDate': startDate + 'T00:00:00-08:00',
+                        'endDate': endDate + 'T23:59:59-08:00'
+                },
+            },
+        'query': 'query getAccountingAPIFetchJournalsForDates($input: FetchJournalsForDatesInput!) {\n  getAccountingAPIFetchJournalsForDates(input: $input) {\n    journals {\n      id\n      createdAt\n      updatedAt\n      deletedAt\n      notes\n      oldCustomDate\n      newCustomDate\n      orderNumber\n      data\n      changeTag\n      reportedCount\n    }\n  }\n}\n'
+    }
+        
+    response = requests.post('https://api.nabis.com/graphql/admin', headers=headers, json=json_data)
+
+    data = response.json()
+    return data
+
+
+def creation_logs(data):
+    df = pd.DataFrame(data['data']['getAccountingAPIFetchJournalsForDates']['journals'])
+    applications = [ {'changeTag':i['changeTag'], 'createdAt':i['createdAt'] , 'Data':i['data']} for i in data['data']['getAccountingAPIFetchJournalsForDates']['journals']]
+
+    df_applications = pd.DataFrame(applications)
+
+    return df_applications
+
+
+def payments_creation_logs(df_applications):
+    payment_creation = df_applications.loc[df_applications['changeTag'].str.contains('unapplied')]
+
+    df_pmt_creation = [i['transaction'] for idx,i in enumerate(payment_creation['Data']) ]
+    createdAt_list = [i for i in payment_creation['createdAt']]
+    changeTag_list = [i for i in payment_creation['changeTag']]
+
+    list_pmt_created = []
+    for idx,item in enumerate(df_pmt_creation):
+        item['createdat'] = createdAt_list[idx]
+        item['changeTag'] = changeTag_list[idx]
+        list_pmt_created.append(item)
+
+
+    payment_creation_data = pd.DataFrame(list_pmt_created)
+    payment_creation_data = payment_creation_data.loc[~payment_creation_data['changeTag'].str.contains('meta')]
+
+    payment_creation_data['bank_account'] = np.where(((payment_creation_data['method']=='CHECK') | (payment_creation_data['method']=='EFT') ) & (payment_creation_data['originCompany']=='NABITWO'), 1093,
+                                        np.where((payment_creation_data['method']=='EFT') & (payment_creation_data['originCompany']=='NABIFIVE'),1090,
+                                                 np.where((payment_creation_data['method']=='CHECK') & (payment_creation_data['originCompany']=='NABIFIVE'),808,
+                                                          np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_LA'),1095,
+                                                                   np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_OAK'),1094,
+                                                                            np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_WOODLAKE'),1106, np.nan
+                                        ))))))
+
+    
+    payments_df = payment_creation_data.loc[(payment_creation_data['type']=='PAYMENT') & (payment_creation_data['qbCustomerPaidById']!='6045')]
+    self_collected_df = payment_creation_data.loc[payment_creation_data['type']=='SELF_COLLECTED']
+    writeoff_df = payment_creation_data.loc[payment_creation_data['type']=='WRITE_OFF_EXTERNAL']
+    nabis_creditMemos_df = payment_creation_data.loc[payment_creation_data['type']=='NABIS_CREDIT_MEMO']
+
+    return payments_df,self_collected_df,writeoff_df,nabis_creditMemos_df
+
+
+def submit_payment_creation(df_to_submit):
+    payments_created_json = df_to_submit.reset_index(names='Index_ID').to_json(orient='records')
+    data_json = {'data':payments_created_json}
+    data_json_pmts_creation = json.dumps(data_json) 
+    wenhook_pmt_creation = 'https://hook.us1.make.com/u9202iqqgs1lv8escbyh4xbk17pmaxjd'
+    response = requests.post(wenhook_pmt_creation,data=data_json_pmts_creation,headers={'Content-Type': 'application/json'})
+
+    return response
+
+
+def payment_application_data(df_applications):
+    payment_applied = df_applications.loc[df_applications['changeTag'].str.startswith('applied')]
+
+    df_pmt_applied = [i['transaction'] for i in payment_applied['Data']]
+    createdAt_list = [i for i in payment_applied['createdAt']]
+    changeTag_list = [i for i in payment_applied['changeTag']]
+
+    list_payments_applied = []
+    for idx,item in enumerate(df_pmt_applied):
+        item['createdat'] = createdAt_list[idx]
+        item['changeTag'] = changeTag_list[idx]
+        list_payments_applied.append(item)
+
+    payment_applied_data = pd.DataFrame(list_payments_applied)
+    payment_applied_data = payment_applied_data.loc[~payment_applied_data['changeTag'].str.contains('meta')]
+    
+    method_mapping = {'CHECK': 10,
+                  'CASH': 9,
+                  'EFT':12}
+
+    
+    payment_applied_data['Method_ID'] = payment_applied_data['method'].map(method_mapping)
+    applied_noOrderProvided_data = payment_applied_data.loc[payment_applied_data['orderNumber'].isnull()]
+    nabione_payments_df = payment_applied_data.loc[payment_applied_data['qbCustomerPaidById']=='6045'].copy()
+    nabione_payments_df = nabione_payments_df.loc[~nabione_payments_df['orderNumber'].isna()]
+    payment_applied_df = payment_applied_data.loc[(payment_applied_data['type']=='PAYMENT') & (~payment_applied_data['orderNumber'].isnull())].copy()
+    payment_applied_df = payment_applied_df.loc[(~payment_applied_df['Method_ID'].isnull())].copy()
+    payment_applied_df = payment_applied_df.loc[payment_applied_df['qbCustomerPaidById']!='6045'].copy()
+    payment_applied_df[['orderNumber','Method_ID']] = payment_applied_df[['orderNumber','Method_ID']].astype(int)
+    nabione_payments_df[['orderNumber','Method_ID']] = nabione_payments_df[['orderNumber','Method_ID']].astype(int)
+
+    write_off_applied_data = payment_applied_data.loc[payment_applied_data['changeTag'].str.contains('WRITE')].copy()
+    write_off_applied_data['orderNumber'] = write_off_applied_data['orderNumber'].astype(int)
+
+
+    return payment_applied_df,applied_noOrderProvided_data,nabione_payments_df,write_off_applied_data
+
+
+def submit_payment_application(payment_applied_data):
+    payment_applied_json = payment_applied_data.reset_index(names='Index_ID').to_json(orient='records')
+    data_json = {'data':payment_applied_json}
+    data_json_pmts_applied = json.dumps(data_json)
+    wenhook_pmt_creation = 'https://hook.us1.make.com/74projknbpaur0175659mmdfz8j5ouwu'
+    response = requests.post(wenhook_pmt_creation,data=data_json_pmts_applied,headers={'Content-Type': 'application/json'})
+    
+    return response
+
+
+def remittance_report(df_applications):
+    remittance = df_applications.loc[df_applications['changeTag'].str.contains('remittance_acceptance')]
+
+    df_remittance = [pd.DataFrame(i['remittances']) for i in remittance['Data']]
+    createdAt_list = [i for i in remittance['createdAt']]
+    changeTag_list = [i for i in remittance['changeTag']]
+
+
+    try:
+        for idx,item in enumerate(df_remittance):
+            item['createdat'] = createdAt_list[idx]
+            item['changeTag'] = changeTag_list[idx]
+
+        remittance_report = pd.concat(df_remittance)
+        
+    except:
+        remittance_report = pd.DataFrame(df_remittance)
+        pass
+
+    if len(df_remittance) >0:    
+        deductions_report = remittance_report.loc[remittance_report['type']=='DEDUCTION']
+    else:
+        deductions_report = pd.DataFrame()    
+
+    return remittance_report,deductions_report
+
+
+def rollback_data(df_applications):
+    rollback = df_applications.loc[df_applications['changeTag'].str.startswith('rollback')]
+
+    df_rollback = [i['transaction'] for i in rollback['Data']]
+    createdAt_list = [i for i in rollback['createdAt']]
+    changeTag_list = [i for i in rollback['changeTag']]
+
+    list_rollback_created = []
+    for idx,item in enumerate(df_rollback):
+        item['createdat'] = createdAt_list[idx]
+        item['changeTag'] = changeTag_list[idx]
+        list_rollback_created.append(item)
+
+    rollback_creation_data = pd.DataFrame(list_rollback_created)
+
+    return rollback_creation_data
+
+
+def pending_deductions(df_applications):
+    pending_deductions = df_applications.loc[df_applications['changeTag'].str.contains('pending-deduction-creation')]
+
+    df_pending_deduction = [i['pendingDeduction'] for i in pending_deductions['Data']]
+    createdAt_list = [i for i in pending_deductions['createdAt']]
+    changeTag_list = [i for i in pending_deductions['changeTag']]
+
+    list_pending_deductions = []
+    for idx,item in enumerate(df_pending_deduction):
+        item['createdat'] = createdAt_list[idx]
+        item['changeTag'] = changeTag_list[idx]
+        list_pending_deductions.append(item)
+
+    pending_deductions_data = pd.DataFrame(list_pending_deductions)
+
+    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassPaidById':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first'}).reset_index()
+    deductions_df = pending_deductions_data_grp.copy()
+
+    return deductions_df,pending_deductions_data
+
+
+def submit_deductions_application(deductions_data):
+    deductions_json = deductions_data.reset_index(names='Index_ID').to_json(orient='records')
+    data_json = {'data':deductions_json}
+    data_json_pmts_applied = json.dumps(data_json)
+    wenhook_pmt_creation = 'https://hook.us1.make.com/92h5u32aya4rimaqhtaji73ihc4csvbd'
+    response = requests.post(wenhook_pmt_creation,data=data_json_pmts_applied,headers={'Content-Type': 'application/json'})
+    
+    return response
+
+
+def submit_noOrders_application(no_orders_data):
+    noOrders_json = no_orders_data.reset_index(names='Index_ID').to_json(orient='records')
+    data_json = {'data':noOrders_json}
+    data_json_noOrders = json.dumps(data_json)
+    webhook_noOrders = 'https://hook.us1.make.com/5y2ttxx8cjzti2emyfpstu2uu0adglu3'
+    response = requests.post(webhook_noOrders, data=data_json_noOrders, headers={'Content-Type': 'application/json'})
+
+    return response
+
+
+def submit_write_off(write_off_data):
+    write_off_json = write_off_data.reset_index(names='Index_ID').to_json(orient='records')
+    data_json = {'data':write_off_json}
+    data_json_write_off = json.dumps(data_json)
+    webhook_write_off = 'https://hook.us1.make.com/s8n25vyenozx2vywtvi98iv2ux54hi8a'
+    response = requests.post(webhook_write_off,data=data_json_write_off,headers={'Content-Type': 'application/json'})
+    
+    return response
+
+
+def submit_nabione(nabione_data):
+    nabione_json = nabione_data.reset_index(names='Index_ID').to_json(orient='records')
+    data_json = {'data':nabione_json}
+    data_json_nabione = json.dumps(data_json)
+    webhook_nabione = 'https://hook.us1.make.com/crfgdh7qu23otm6a91hbsvh52ajagfvu'
+    response = requests.post(webhook_nabione,data=data_json_nabione,headers={'Content-Type': 'application/json'})
+    
+    return response
+
+
+
+with st.form(key='log_in',):
+
+    email = st.text_input('email:'),
+    password_st = st.text_input('Password:',type='password')
+
+    submitted = st.form_submit_button('Log in')
+
+try:
+    if submitted:
+        st.write('Credentials Saved')
+
+
+        user = email[0]
+        password = password_st
+        token,user_id = get_bearer_token(user,password)
+        headers = create_headers(token)
+        st.session_state['headers'] = headers
+        
+except:
+    st.warning('Incorrect Email or Password, Try again')
+
+
+
+if submitted:
+    st.session_state['initialize'] = 'initialize'
+
+
+if "initialize" not in st.session_state:
+    st.write('Enter Your Credentials and Generate Dataframe')
+else:
+
+    startDate = st.date_input("Select Start Date",value=dt.datetime.today(),format="YYYY-MM-DD",key='start')
+    endDate = st.date_input("Select End Date",value=dt.datetime.today(),format="YYYY-MM-DD",key='end')
+    startDate = str(startDate)
+    endDate = str(endDate)
+
+    as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
+
+    st.cache_data()
+    df_applications = creation_logs(as_logs)
+    st.session_state['df_applications'] = df_applications
+
+    payment_creation_data,self_collected,write_off,nabis_credit_memo = payments_creation_logs(st.session_state['df_applications'])
+    payments_application_data,applied_noOrderProvided_data,nabione_df,write_off_applied_data = payment_application_data(st.session_state['df_applications'])
+    remittances_report,deductions_report = remittance_report(st.session_state['df_applications'])
+    rollback_df = rollback_data(st.session_state['df_applications'])
+    pending_deductions_df,pending_deductions_data = pending_deductions(st.session_state['df_applications'])
+
+    st.warning('Be careful before sending data to QBO ensure you will not duplicate any item', icon="⚠️")
+
+    st.text(f"Payments DataFrame for period from {startDate} to {endDate}")
+
+    
+    payment_creation_data = payment_creation_data.loc[~payment_creation_data['bank_account'].isna()].copy()
+    
+
+    csv_payments = payment_creation_data.to_csv().encode('utf-8')
+    
+
+    user_input_creation = st.number_input('Index Number',min_value=0,value=0,key='pmt_creation')
+
+    
+    if int(user_input_creation) == 0:
+        payment_creation_data
+    else:
+        index_creation = int(user_input_creation)
+        payment_creation_data = payment_creation_data[payment_creation_data.index.get_loc(index_creation)+1:]
+        payment_creation_data
+
+    
+    st.download_button('Download Payments Data',data=csv_payments,file_name='Payments.csv',mime='text/csv')    
+    
+    submit_button = st.button('Send Payments to QBO',key='creation')
+    if submit_button:
+        response = submit_payment_creation(payment_creation_data)
+    
+        st.write('Request sent to Make automation, review google sheet below for JE logs')
+        st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')
+
+    st.markdown('---')
+
+    st.success('Once the JEs in QBO are created, submit the applications',icon="🚨")
+    st.text(f"Payments Application DataFrame for period from {startDate} to {endDate}")
+    
+
+    csv_payments_applications = payments_application_data.to_csv().encode('utf-8')
+    
+
+    st.text('Filter DataFrame if the app stops and the applications were inclopleted, Pull the Index number from the google sheet available on Column called "Index_Dataframe"')
+    user_input = st.number_input('Index Number',min_value=0,value=0,key='pmt_application')
+
+        
+    if int(user_input) == 0:
+        payments_application_data
+    else:
+        index_input = int(user_input)
+        payments_application_data = payments_application_data[payments_application_data.index.get_loc(index_input)+1:]
+        payments_application_data
+
+    st.download_button('Download Payments Application Data',data=csv_payments_applications,file_name='Payments_applications.csv',mime='text/csv')    
+
+    submit_applications = st.button('Submit Payment Applications')
+
+    if submit_applications:
+        response = submit_payment_application(payments_application_data)
+        st.write('Request sent to Make automation, review google sheet below for JE logs')
+        st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
+
+
+    st.markdown('---')
+    st.text('Nabione Payments Created, Dataframe')
+    
+    csv_nabione = nabione_df.to_csv().encode('utf-8')
+    
+
+    user_input_nabione = st.number_input('Index Number',min_value=0,value=0,key='nabione')
+
+    if int(user_input_nabione) == 0:
+        nabione_df
+    else:
+        index_nabione = int(user_input_nabione)
+        nabione_df = nabione_df[nabione_df.index.get_loc(index_nabione)+1:]
+        nabione_df    
+
+    st.download_button('Download Nabione Payments Created Data',data=csv_nabione,file_name='Nabione_Payments_Created.csv',mime='text/csv')
+
+    nabione_button = st.button("Submit Nabione Transactions")
+
+    if nabione_button:
+        response = submit_nabione(nabione_df)
+        st.write('Request sent to Make automation, review google sheet below for JE logs')
+        st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
+
+
+
+    st.markdown('---')
+    st.text('Payments Applied to Manual invoices')
+    
+    csv_payments_applications_noOrder = applied_noOrderProvided_data.to_csv().encode('utf-8')
+
+    user_input_noOrders = st.number_input('Index Number',min_value=0,value=0,key='noOrder')
+
+    if int(user_input_noOrders) == 0:
+        applied_noOrderProvided_data
+    else:
+        index_noOrders = int(user_input_noOrders)
+        applied_noOrderProvided_data = applied_noOrderProvided_data[applied_noOrderProvided_data.index.get_loc(index_noOrders)+1:]
+        applied_noOrderProvided_data
+
+    submit_noOrders = st.button('Submit No orders applications')
+    if submit_noOrders:
+        response = submit_noOrders_application(applied_noOrderProvided_data)
+        st.write('Request sent to Make automation, review google sheet below for JE logs')
+        st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')  
+
+    st.download_button('Download Payments Application No Orders Data',data=csv_payments_applications_noOrder,file_name='Payments_applications_noOrders.csv',mime='text/csv')
+
+
+    st.markdown('---')
+    st.text('Deductions Report DataFrame')
+    
+    csv_deductions = pending_deductions_df.to_csv().encode('utf-8')
+
+    pending_deductions_df['eligbleAt'] = pd.to_datetime(pending_deductions_df['eligbleAt'])
+
+    user_input_deductions = st.number_input('Index Number',min_value=0,value=0,key='deductions')
+
+    if int(user_input_deductions) == 0:
+        pending_deductions_df
+    else:
+        index_deductions = int(user_input_deductions)
+        pending_deductions_df = pending_deductions_df[pending_deductions_df.index.get_loc(index_deductions)+1:]
+        pending_deductions_df    
+
+    
+    st.download_button('Download Deductions Data',data=csv_deductions,file_name='deductions.csv',mime='text/csv')
+    
+    submit_deductions = st.button('Submit Deductions')
+    if submit_deductions:
+        response = submit_deductions_application(pending_deductions_df)
+        st.write('Request sent to Make automation, review google sheet below for JE logs')
+        st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
+
+
+    st.markdown('---')
+    st.text('Rollback Report DataFrame')
+    rollback_df
+    csv_rollback = rollback_df.to_csv().encode('utf-8')
+    st.download_button('Download Rollback Data',data=csv_rollback,file_name='Rollback.csv',mime='text/csv')    
+    

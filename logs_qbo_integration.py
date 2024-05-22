@@ -271,7 +271,27 @@ if submitted:
 if "initialize" not in st.session_state:
     st.write('Enter Your Credentials and Generate Dataframe')
 else:
+  
+    with st.expander('Instructions'):
+        st.text('Select the range of dates you want to work with')
+        st.text('Click on the submit button to send the instructions to make to start performing the applications in QBO')
+        st.text('Review the google sheets file provided to ensure all the applications were perform')
+        st.text('If the app stops for some reason. fill in "Index Number" provide the index of the last application, you can find the index on the google sheets file')
+        
+        st.markdown('***')
+        
+        st.subheader('Map of tabs in google sheets')
+        st.write('Tab "Data" --> Contains the Payment Creation Information.')
+        st.write('Tab "Application_Data" --> Contains payments applied to fee invoice.')
+        st.write('Tab "JE_applications" --> Contains Journal Entries for due to consignor.')
+        st.warning('Tab Application_Data and JE_applications are for the same dataframe, you should look for the largest index number on both tabs')
+        st.write('Tab "Deductions" --> Contains Journal Entries for Deductions.')
+        st.write('Tab "AR Holding JE" --> Contains Journal Entries for Deductions where invoice does not exist in QBO.')
+        st.write('Tab "Nabione_transactions" --> Contains Journal Entries for short payments transactions.')
+        st.write('Tab "Manual Invoices Applications" --> Contains Journal Entries for manual invoices and/or nabione.')
+        st.markdown('***')
 
+  
     startDate = st.date_input("Select Start Date",value=dt.datetime.today(),format="YYYY-MM-DD",key='start')
     endDate = st.date_input("Select End Date",value=dt.datetime.today(),format="YYYY-MM-DD",key='end')
     startDate = str(startDate)

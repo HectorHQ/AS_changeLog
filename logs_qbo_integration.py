@@ -271,7 +271,8 @@ if submitted:
 if "initialize" not in st.session_state:
     st.write('Enter Your Credentials and Generate Dataframe')
 else:
-  
+
+    st.markdown(':red[DO NOT RUN MULTIPLE DATA FRAME SUBMISSIONS AT ONCE!]')
     with st.expander('Instructions'):
         st.text('Select the range of dates you want to work with')
         st.text('Click on the submit button to send the instructions to make to start performing the applications in QBO')

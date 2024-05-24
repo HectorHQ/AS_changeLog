@@ -276,7 +276,7 @@ else:
         st.text('Select the range of dates you want to work with')
         st.text('Click on the submit button to send the instructions to make to start performing the applications in QBO')
         st.text('Review the google sheets file provided to ensure all the applications were perform')
-        st.text('If the app stops for some reason. fill in "Index Number" with the index of the last application, and the app automatically will take the next item, you can find the index on the google sheets file')
+        st.text('If the application stops and the transactions are incomplete, retrieve the index number of the last recorded row and input it below. Transactions will start from the next unrecorded index.')
         
         st.markdown('***')
         

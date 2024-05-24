@@ -349,7 +349,7 @@ else:
     csv_payments_applications = payments_application_data.to_csv().encode('utf-8')
     
 
-    st.text('Filter DataFrame if the app stops and the applications were inclopleted, Pull the Index number from the google sheet available on Column called "Index_Dataframe"')
+    st.text('Filter DataFrame If the app stops and the applications are incompleted, Pull the Index number from the google sheet available in Column called "Index_Dataframe"')
     user_input = st.number_input('Index Number',min_value=0,value=0,key='pmt_application')
 
         

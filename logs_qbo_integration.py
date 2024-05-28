@@ -196,7 +196,7 @@ def pending_deductions(df_applications):
 
     pending_deductions_data = pd.DataFrame(list_pending_deductions)
 
-    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassPaidById':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first'}).reset_index()
+    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first'}).reset_index()
     deductions_df = pending_deductions_data_grp.copy()
 
     return deductions_df,pending_deductions_data

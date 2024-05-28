@@ -129,8 +129,9 @@ def submit_payment_application(payment_applied_data):
     payment_applied_json = payment_applied_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':payment_applied_json}
     data_json_pmts_applied = json.dumps(data_json)
-    wenhook_pmt_creation = 'https://hook.us1.make.com/74projknbpaur0175659mmdfz8j5ouwu'
-    response = requests.post(wenhook_pmt_creation,data=data_json_pmts_applied,headers={'Content-Type': 'application/json'})
+    #wenhook_pmt_creation = 'https://hook.us1.make.com/74projknbpaur0175659mmdfz8j5ouwu'
+    webhook_pmt_application_nabifive = 'https://hook.us1.make.com/o536jj2c0wx2y6bgmrcid8ysb9cfars5'
+    response = requests.post(webhook_pmt_application_nabifive,data=data_json_pmts_applied,headers={'Content-Type': 'application/json'})
     
     return response
 

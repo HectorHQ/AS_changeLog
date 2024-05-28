@@ -206,8 +206,9 @@ def submit_deductions_application(deductions_data):
     deductions_json = deductions_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':deductions_json}
     data_json_pmts_applied = json.dumps(data_json)
-    wenhook_pmt_creation = 'https://hook.us1.make.com/92h5u32aya4rimaqhtaji73ihc4csvbd'
-    response = requests.post(wenhook_pmt_creation,data=data_json_pmts_applied,headers={'Content-Type': 'application/json'})
+    #wenhook_pmt_creation = 'https://hook.us1.make.com/92h5u32aya4rimaqhtaji73ihc4csvbd'
+    webhook_pending_deductions_nabifive = 'https://hook.us1.make.com/5lilbjljxwy2qxlyhqfrkd5zwyxnd29w'
+    response = requests.post(webhook_pending_deductions_nabifive,data=data_json_pmts_applied,headers={'Content-Type': 'application/json'})
     
     return response
 

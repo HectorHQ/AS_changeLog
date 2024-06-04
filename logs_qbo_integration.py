@@ -119,6 +119,7 @@ def payment_application_data(df_applications):
     nabione_payments_df[['orderNumber','Method_ID']] = nabione_payments_df[['orderNumber','Method_ID']].astype(int)
 
     write_off_applied_data = payment_applied_data.loc[payment_applied_data['changeTag'].str.contains('WRITE')].copy()
+    write_off_applied_data['orderNumber'] = write_off_applied_data['orderNumber'].replace([np.inf, -np.inf], np.nan).fillna(0)
     write_off_applied_data['orderNumber'] = write_off_applied_data['orderNumber'].astype(int)
 
 

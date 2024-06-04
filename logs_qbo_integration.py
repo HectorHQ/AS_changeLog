@@ -432,6 +432,7 @@ else:
     
     submit_button = st.button('Send Payments to QBO',key='creation')
     if submit_button:
+        payment_creation_data[['appliedAt','createdat']] = pd.to_datetime(payment_creation_data[['appliedAt','createdat']])
         response = submit_payment_creation(payment_creation_data)
     
         st.write('Request sent to Make automation, review google sheet below for JE logs')
@@ -462,6 +463,7 @@ else:
     submit_applications = st.button('Submit Payment Applications')
 
     if submit_applications:
+        payments_application_data[['appliedAt','createdat']] = pd.to_datetime(payments_application_data[['appliedAt','createdat']])
         response = submit_payment_application(payments_application_data)
         st.write('Request sent to Make automation, review google sheet below for JE logs')
         st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
@@ -488,6 +490,7 @@ else:
     nabione_button = st.button("Submit Nabione Transactions")
 
     if nabione_button:
+        nabione_df[['appliedAt','createdat']] = pd.to_datetime(nabione_df[['appliedAt','createdat']])
         response = submit_nabione(nabione_df)
         st.write('Request sent to Make automation, review google sheet below for JE logs')
         st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
@@ -511,6 +514,7 @@ else:
 
     submit_noOrders = st.button('Submit No orders applications')
     if submit_noOrders:
+        applied_noOrderProvided_data[['appliedAt','createdat']] = pd.to_datetime(applied_noOrderProvided_data[['appliedAt','createdat']])
         response = submit_noOrders_application(applied_noOrderProvided_data)
         st.write('Request sent to Make automation, review google sheet below for JE logs')
         st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')  
@@ -540,6 +544,7 @@ else:
     
     submit_deductions = st.button('Submit Deductions')
     if submit_deductions:
+        pending_deductions_df[['appliedAt','createdat']] = pd.to_datetime(pending_deductions_df[['appliedAt','createdat']])
         response = submit_deductions_application(pending_deductions_df)
         st.write('Request sent to Make automation, review google sheet below for JE logs')
         st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    

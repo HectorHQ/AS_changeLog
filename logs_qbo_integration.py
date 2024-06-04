@@ -246,6 +246,90 @@ def submit_nabione(nabione_data):
     return response
 
 
+st.cache()
+def filter_dataframe(df: pd.DataFrame,key) -> pd.DataFrame:
+        """
+        Adds a UI on top of a dataframe to let viewers filter columns
+
+        Args:
+            df (pd.DataFrame): Original dataframe
+
+        Returns:
+            pd.DataFrame: Filtered dataframe
+        """
+        modify = st.checkbox("Add filters",value=False,key=key)
+
+        if not modify:
+            return df
+
+        df = df.copy()
+
+        key2 = key + '_'
+        
+        # Try to convert datetimes into a standard format (datetime, no timezone)
+        for col in df.columns:
+            if is_object_dtype(df[col]):
+                try:
+                    df[col] = pd.to_datetime(df[col])
+                except Exception:
+                    pass
+
+            if is_datetime64_any_dtype(df[col]):
+                df[col] = df[col].dt.tz_localize(None)
+
+        modification_container = st.container()
+
+        with modification_container:
+            to_filter_columns = st.multiselect("Filter dataframe on", df.columns)
+            for column in to_filter_columns:
+                left, right = st.columns((1, 20))
+                # Treat columns with < 10 unique values as categorical
+                if is_categorical_dtype(df[column]) or df[column].nunique() < 10:
+                    user_cat_input = right.multiselect(
+                        f"Values for {column}",
+                        df[column].unique(),
+                        default=list(df[column].unique()),
+                    )
+                    df = df[df[column].isin(user_cat_input)]
+                elif is_numeric_dtype(df[column]):
+                    _min = float(df[column].min())
+                    _max = float(df[column].max())
+                    step = (_max - _min) / 100
+                    user_num_input = right.slider(
+                        f"Values for {column}",
+                        min_value=_min,
+                        max_value=_max,
+                        value=(_min, _max),
+                        step=step,
+                    )
+                    df = df[df[column].between(*user_num_input)]
+                elif is_datetime64_any_dtype(df[column]):
+                    user_date_input = right.date_input(
+                        f"Values for {column}",
+                        value=(
+                            df[column].min(),
+                            df[column].max(),
+                        ),
+                    )
+                    if len(user_date_input) == 2:
+                        user_date_input = tuple(map(pd.to_datetime, user_date_input))
+                        start_date, end_date = user_date_input
+                        df = df.loc[df[column].between(start_date, end_date)]
+                else:
+                    user_text_input = right.text_input(
+                        f"Write {column} Name",key= f'{key}_text_widget'
+                    )
+
+                    user_text_input = user_text_input.split()
+                    user_text_input
+                    if user_text_input:
+                        df = df[df[column].isin(user_text_input)]
+                        
+        
+        return df
+
+
+
 
 with st.form(key='log_in',):
 
@@ -329,7 +413,7 @@ else:
 
     user_input_creation = st.number_input('Index Number',min_value=0,value=0,key='pmt_creation')
 
-    
+    payment_creation_data = filter_dataframe(payment_creation_data,key='create_payment')
     if int(user_input_creation) == 0:
         payment_creation_data
     else:
@@ -359,7 +443,7 @@ else:
     st.text('Filter DataFrame If the app stops and the applications are incompleted, Pull the Index number from the google sheet available in Column called "Index_Dataframe"')
     user_input = st.number_input('Index Number',min_value=0,value=0,key='pmt_application')
 
-        
+    payments_application_data = filter_dataframe(payments_application_data,key='filter_applications')    
     if int(user_input) == 0:
         payments_application_data
     else:
@@ -384,7 +468,8 @@ else:
     
 
     user_input_nabione = st.number_input('Index Number',min_value=0,value=0,key='nabione')
-
+    nabione_df = filter_dataframe(nabione_df,key='key_2')
+  
     if int(user_input_nabione) == 0:
         nabione_df
     else:
@@ -409,7 +494,8 @@ else:
     csv_payments_applications_noOrder = applied_noOrderProvided_data.to_csv().encode('utf-8')
 
     user_input_noOrders = st.number_input('Index Number',min_value=0,value=0,key='noOrder')
-
+    applied_noOrderProvided_data = filter_dataframe(applied_noOrderProvided_data,key = 'filter_Manuals')
+  
     if int(user_input_noOrders) == 0:
         applied_noOrderProvided_data
     else:
@@ -434,7 +520,8 @@ else:
     pending_deductions_df['eligbleAt'] = pd.to_datetime(pending_deductions_df['eligbleAt'])
 
     user_input_deductions = st.number_input('Index Number',min_value=0,value=0,key='deductions')
-
+    pending_deductions_df = filter_dataframe(pending_deductions_df,key = 'filter_deductions')
+  
     if int(user_input_deductions) == 0:
         pending_deductions_df
     else:

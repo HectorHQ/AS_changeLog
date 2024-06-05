@@ -74,7 +74,7 @@ def payments_creation_logs(df_applications):
                                         ))))))
 
     
-    payments_df = payment_creation_data.loc[(payment_creation_data['type']=='PAYMENT') & (payment_creation_data['qbCustomerPaidById']!='6045') | (payment_creation_data['qbCustomerPaidById']!='1701')]
+    payments_df = payment_creation_data.loc[(payment_creation_data['type']=='PAYMENT') & (payment_creation_data['qbCustomerPaidById']!='6045' | payment_creation_data['qbCustomerPaidById']!='1701')]
     self_collected_df = payment_creation_data.loc[payment_creation_data['type']=='SELF_COLLECTED']
     writeoff_df = payment_creation_data.loc[payment_creation_data['type']=='WRITE_OFF_EXTERNAL']
     nabis_creditMemos_df = payment_creation_data.loc[payment_creation_data['type']=='NABIS_CREDIT_MEMO']

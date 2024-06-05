@@ -205,7 +205,7 @@ def pending_deductions(df_applications):
 
     manual_invs_deductions = pending_deductions_data.loc[pending_deductions_data['orderNumber'].isna()].copy()
     
-    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first'}).reset_index()
+    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first','invoiceNumber':'first'}).reset_index()
     columns_names = pending_deductions_data_grp.columns.tolist()
 
     manual_invs_deductions = manual_invs_deductions[columns_names]

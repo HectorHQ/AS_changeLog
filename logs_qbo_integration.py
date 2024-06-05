@@ -554,7 +554,7 @@ else:
     
     submit_deductions = st.button('Submit Deductions')
     if submit_deductions:
-        pending_deductions_df['appliedAt'] = pd.to_datetime(pending_deductions_df['appliedAt'])
+        pending_deductions_df['eligbleAt'] = pd.to_datetime(pending_deductions_df['eligbleAt'])
         pending_deductions_df['createdat'] = pd.to_datetime(pending_deductions_df['createdat'])
         response = submit_deductions_application(pending_deductions_df)
         st.write('Request sent to Make automation, review google sheet below for JE logs')

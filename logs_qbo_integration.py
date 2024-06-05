@@ -109,9 +109,9 @@ def payment_application_data(df_applications):
     payment_applied_data = pd.DataFrame(list_payments_applied)
     payment_applied_data = payment_applied_data.loc[~payment_applied_data['changeTag'].str.contains('meta')]
     
-    method_mapping = {'CHECK': 10,
-                  'CASH': 9,
-                  'EFT':12}
+    method_mapping = {'CHECK': 3,
+                  'CASH': 2,
+                  'EFT':6}
 
     
     payment_applied_data['Method_ID'] = payment_applied_data['method'].map(method_mapping)

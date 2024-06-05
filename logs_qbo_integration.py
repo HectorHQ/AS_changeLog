@@ -65,12 +65,12 @@ def payments_creation_logs(df_applications):
     payment_creation_data = pd.DataFrame(list_pmt_created)
     payment_creation_data = payment_creation_data.loc[~payment_creation_data['changeTag'].str.contains('meta')]
 
-    payment_creation_data['bank_account'] = np.where(((payment_creation_data['method']=='CHECK') | (payment_creation_data['method']=='EFT') ) & (payment_creation_data['originCompany']=='NABITWO'), 1093,
-                                        np.where((payment_creation_data['method']=='EFT') & (payment_creation_data['originCompany']=='NABIFIVE'),1090,
-                                                 np.where((payment_creation_data['method']=='CHECK') & (payment_creation_data['originCompany']=='NABIFIVE'),808,
-                                                          np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_LA'),1095,
-                                                                   np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_OAK'),1094,
-                                                                            np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_WOODLAKE'),1106, np.nan
+    payment_creation_data['bank_account'] = np.where(((payment_creation_data['method']=='CHECK') | (payment_creation_data['method']=='EFT') ) & (payment_creation_data['originCompany']=='NABITWO'), 473,
+                                        np.where((payment_creation_data['method']=='EFT') & (payment_creation_data['originCompany']=='NABIFIVE'),469,
+                                                 np.where((payment_creation_data['method']=='CHECK') & (payment_creation_data['originCompany']=='NABIFIVE'),61,
+                                                          np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_LA'),475,
+                                                                   np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_OAK'),474,
+                                                                            np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_WOODLAKE'),486, np.nan
                                         ))))))
 
     
@@ -116,7 +116,7 @@ def payment_application_data(df_applications):
     
     payment_applied_data['Method_ID'] = payment_applied_data['method'].map(method_mapping)
     applied_noOrderProvided_data = payment_applied_data.loc[payment_applied_data['orderNumber'].isnull()]
-    nabione_payments_df = payment_applied_data.loc[payment_applied_data['qbCustomerPaidById']=='6045'].copy()
+    nabione_payments_df = payment_applied_data.loc[(payment_applied_data['qbCustomerPaidById']=='6045') | (payment_applied_data['qbCustomerPaidById']=='1701')].copy()
     nabione_payments_df = nabione_payments_df.loc[~nabione_payments_df['orderNumber'].isna()]
     payment_applied_df = payment_applied_data.loc[(payment_applied_data['type']=='PAYMENT') & (~payment_applied_data['orderNumber'].isnull())].copy()
     payment_applied_df = payment_applied_df.loc[(~payment_applied_df['Method_ID'].isnull())].copy()

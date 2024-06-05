@@ -203,8 +203,13 @@ def pending_deductions(df_applications):
 
     pending_deductions_data = pd.DataFrame(list_pending_deductions)
 
-    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber',dropna=False).agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first'}).reset_index()
-    deductions_df = pending_deductions_data_grp.copy()
+    manual_invs_deductions = pending_deductions_data.loc[pending_deductions_data[orderNumber].isna()].copy()
+    
+    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first'}).reset_index()
+    columns_names = pending_deductions_data_grp.columns()
+
+    manual_invs_deductions = manual_invs_deductions[columns_names]
+    deductions_df = pd.concat([pending_deductions_data_grp,manual_invs_deductions])
     
 
     return deductions_df,pending_deductions_data

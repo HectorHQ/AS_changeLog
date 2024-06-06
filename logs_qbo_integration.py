@@ -415,7 +415,7 @@ else:
 
     st.warning('Be careful before sending data to QBO ensure you will not duplicate any item', icon="⚠️")
 
-    st.text(f"Payments DataFrame for period from {startDate} to {endDate}")
+    st.subheader(f":orange[Payments DataFrame for period from {startDate} to {endDate}]")
 
     
     payment_creation_data = payment_creation_data.loc[~payment_creation_data['bank_account'].isna()].copy()
@@ -449,7 +449,7 @@ else:
     st.markdown('---')
 
     st.success('Once the JEs in QBO are created, submit the applications',icon="🚨")
-    st.text(f"Payments Application DataFrame for period from {startDate} to {endDate}")
+    st.subheader(f":orange[Payments Application DataFrame for period from {startDate} to {endDate}]")
     
 
     csv_payments_applications = payments_application_data.to_csv().encode('utf-8')
@@ -479,7 +479,7 @@ else:
 
 
     st.markdown('---')
-    st.text('Nabione Payments Created, Dataframe')
+    st.subheader(':orange[Nabione Payments Created, Dataframe]')
     
     csv_nabione = nabione_df.to_csv().encode('utf-8')
     
@@ -508,7 +508,7 @@ else:
 
 
     st.markdown('---')
-    st.text('Payments Applied to Manual invoices')
+    st.subheader(':orange[Payments Applied to Manual invoices]')
     
     csv_payments_applications_noOrder = applied_noOrderProvided_data.to_csv().encode('utf-8')
 
@@ -534,7 +534,7 @@ else:
 
 
     st.markdown('---')
-    st.text('Deductions Report DataFrame')
+    st.subheader(':orange[Deductions Report DataFrame]')
     
     csv_deductions = pending_deductions_df.to_csv().encode('utf-8')
 
@@ -563,8 +563,14 @@ else:
 
 
     st.markdown('---')
-    st.text('Rollback Report DataFrame')
+    st.subheader(':orange[Rollback Report DataFrame]')
     rollback_df
     csv_rollback = rollback_df.to_csv().encode('utf-8')
     st.download_button('Download Rollback Data',data=csv_rollback,file_name='Rollback.csv',mime='text/csv')    
+
+    st.markdown('---')
+    st.subheader(':orange[Remittances Report DataFrame]')
+    remittances_report
+    csv_remittances = remittances_report.to_csv().encode('utf-8')
+    st.download_button('Download Remittances Data',data=csv_remittances,file_name='Remittances.csv',mime='text/csv') 
     

@@ -402,8 +402,12 @@ else:
     endDate = str(endDate)
 
     st.cache_data()
-    headers = st.session_state['headers']
-    as_logs = logs_AS_transactios(startDate,endDate,headers)
+    if 'headers' not in st.session_state:
+        headers = create_headers(token)
+        st.session_state['headers'] = headers
+        
+    
+    as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
 
     st.cache_data()
     df_applications = creation_logs(as_logs)

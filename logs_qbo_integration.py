@@ -20,7 +20,7 @@ st.set_page_config('Accounting Services - QBO',
 
 st.title(':orange[AS - QBO] Automation Service :factory:')
 
-
+st.cache()
 def logs_AS_transactios(startDate,endDate,headers):
     json_data = {
         'operationName': 'getAccountingAPIFetchJournalsForDates',
@@ -38,7 +38,7 @@ def logs_AS_transactios(startDate,endDate,headers):
     data = response.json()
     return data
 
-
+st.cache()
 def creation_logs(data):
     df = pd.DataFrame(data['data']['getAccountingAPIFetchJournalsForDates']['journals'])
     applications = [ {'changeTag':i['changeTag'], 'createdAt':i['createdAt'] , 'Data':i['data']} for i in data['data']['getAccountingAPIFetchJournalsForDates']['journals']]
@@ -47,7 +47,7 @@ def creation_logs(data):
 
     return df_applications
 
-
+st.cache()
 def payments_creation_logs(df_applications):
     payment_creation = df_applications.loc[df_applications['changeTag'].str.contains('unapplied')]
 
@@ -82,7 +82,7 @@ def payments_creation_logs(df_applications):
 
     return payments_df,self_collected_df,writeoff_df,nabis_creditMemos_df
 
-
+st.cache()
 def submit_payment_creation(df_to_submit):
     payments_created_json = df_to_submit.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':payments_created_json}
@@ -93,7 +93,7 @@ def submit_payment_creation(df_to_submit):
 
     return response
 
-
+st.cache()
 def payment_application_data(df_applications):
     payment_applied = df_applications.loc[df_applications['changeTag'].str.startswith('applied')]
 
@@ -132,7 +132,7 @@ def payment_application_data(df_applications):
 
     return payment_applied_df,applied_noOrderProvided_data,nabione_payments_df,write_off_applied_data
 
-
+st.cache()
 def submit_payment_application(payment_applied_data):
     payment_applied_json = payment_applied_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':payment_applied_json}
@@ -143,7 +143,7 @@ def submit_payment_application(payment_applied_data):
     
     return response
 
-
+st.cache()
 def remittance_report(df_applications):
     remittance = df_applications.loc[df_applications['changeTag'].str.contains('remittance_acceptance')]
 
@@ -170,7 +170,7 @@ def remittance_report(df_applications):
 
     return remittance_report,deductions_report
 
-
+st.cache()
 def rollback_data(df_applications):
     rollback = df_applications.loc[df_applications['changeTag'].str.startswith('rollback')]
 
@@ -188,7 +188,7 @@ def rollback_data(df_applications):
 
     return rollback_creation_data
 
-
+st.cache()
 def pending_deductions(df_applications):
     pending_deductions = df_applications.loc[df_applications['changeTag'].str.contains('pending-deduction-creation')]
 
@@ -215,7 +215,7 @@ def pending_deductions(df_applications):
 
     return deductions_df,pending_deductions_data
 
-
+st.cache()
 def submit_deductions_application(deductions_data):
     deductions_json = deductions_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':deductions_json}
@@ -226,7 +226,7 @@ def submit_deductions_application(deductions_data):
     
     return response
 
-
+st.cache()
 def submit_noOrders_application(no_orders_data):
     noOrders_json = no_orders_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':noOrders_json}
@@ -237,7 +237,7 @@ def submit_noOrders_application(no_orders_data):
 
     return response
 
-
+st.cache()
 def submit_write_off(write_off_data):
     write_off_json = write_off_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':write_off_json}
@@ -247,7 +247,7 @@ def submit_write_off(write_off_data):
     
     return response
 
-
+st.cache()
 def submit_nabione(nabione_data):
     nabione_json = nabione_data.reset_index(names='Index_ID').to_json(orient='records')
     data_json = {'data':nabione_json}
@@ -401,7 +401,9 @@ else:
     startDate = str(startDate)
     endDate = str(endDate)
 
-    as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
+    st.cache_data()
+    headers = st.session_state['headers']
+    as_logs = logs_AS_transactios(startDate,endDate,headers)
 
     st.cache_data()
     df_applications = creation_logs(as_logs)

@@ -396,8 +396,8 @@ else:
         st.markdown('***')
 
   
-    startDate = st.date_input("Select Start Date",value=dt.datetime.today(),format="YYYY-MM-DD",key='start')
-    endDate = st.date_input("Select End Date",value=dt.datetime.today(),format="YYYY-MM-DD",key='end')
+    startDate = st.date_input("Select Start Date",value=(dt.datetime.today() - pd.Timedelta(days=1)),format="YYYY-MM-DD",key='start')
+    endDate = st.date_input("Select End Date",value=(dt.datetime.today()- pd.Timedelta(days=1)),format="YYYY-MM-DD",key='end')
     startDate = str(startDate)
     endDate = str(endDate)
 

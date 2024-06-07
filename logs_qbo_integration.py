@@ -84,7 +84,7 @@ def payments_creation_logs(df_applications):
 
 st.cache()
 def submit_payment_creation(df_to_submit):
-    payments_created_json = df_to_submit.reset_index(names='Index_ID').to_json(orient='records')
+    payments_created_json = df_to_submit.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
     data_json = {'data':payments_created_json}
     data_json_pmts_creation = json.dumps(data_json) 
     #wenhook_pmt_creation = 'https://hook.us1.make.com/u9202iqqgs1lv8escbyh4xbk17pmaxjd'
@@ -134,7 +134,7 @@ def payment_application_data(df_applications):
 
 st.cache()
 def submit_payment_application(payment_applied_data):
-    payment_applied_json = payment_applied_data.reset_index(names='Index_ID').to_json(orient='records')
+    payment_applied_json = payment_applied_data.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
     data_json = {'data':payment_applied_json}
     data_json_pmts_applied = json.dumps(data_json)
     #wenhook_pmt_creation = 'https://hook.us1.make.com/74projknbpaur0175659mmdfz8j5ouwu'
@@ -217,7 +217,7 @@ def pending_deductions(df_applications):
 
 st.cache()
 def submit_deductions_application(deductions_data):
-    deductions_json = deductions_data.reset_index(names='Index_ID').to_json(orient='records')
+    deductions_json = deductions_data.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
     data_json = {'data':deductions_json}
     data_json_pmts_applied = json.dumps(data_json)
     #wenhook_pmt_creation = 'https://hook.us1.make.com/92h5u32aya4rimaqhtaji73ihc4csvbd'
@@ -228,7 +228,7 @@ def submit_deductions_application(deductions_data):
 
 st.cache()
 def submit_noOrders_application(no_orders_data):
-    noOrders_json = no_orders_data.reset_index(names='Index_ID').to_json(orient='records')
+    noOrders_json = no_orders_data.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
     data_json = {'data':noOrders_json}
     data_json_noOrders = json.dumps(data_json)
     #webhook_noOrders = 'https://hook.us1.make.com/5y2ttxx8cjzti2emyfpstu2uu0adglu3'
@@ -239,7 +239,7 @@ def submit_noOrders_application(no_orders_data):
 
 st.cache()
 def submit_write_off(write_off_data):
-    write_off_json = write_off_data.reset_index(names='Index_ID').to_json(orient='records')
+    write_off_json = write_off_data.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
     data_json = {'data':write_off_json}
     data_json_write_off = json.dumps(data_json)
     webhook_write_off = 'https://hook.us1.make.com/s8n25vyenozx2vywtvi98iv2ux54hi8a'
@@ -249,7 +249,7 @@ def submit_write_off(write_off_data):
 
 st.cache()
 def submit_nabione(nabione_data):
-    nabione_json = nabione_data.reset_index(names='Index_ID').to_json(orient='records')
+    nabione_json = nabione_data.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
     data_json = {'data':nabione_json}
     data_json_nabione = json.dumps(data_json)
     #webhook_nabione = 'https://hook.us1.make.com/crfgdh7qu23otm6a91hbsvh52ajagfvu'

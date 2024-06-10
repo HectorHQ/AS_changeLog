@@ -121,7 +121,7 @@ def payment_application_data(df_applications):
     nabione_payments_df = nabione_payments_df.loc[~nabione_payments_df['orderNumber'].isna()]
     payment_applied_df = payment_applied_data.loc[(payment_applied_data['type']=='PAYMENT') & (~payment_applied_data['orderNumber'].isnull())].copy()
     payment_applied_df = payment_applied_df.loc[(~payment_applied_df['Method_ID'].isnull())].copy()
-    payment_applied_df = payment_applied_df.loc[(payment_applied_data['qbCustomerPaidById']!='6045') | (payment_applied_data['qbCustomerPaidById']!='1701')].copy()
+    payment_applied_df = payment_applied_df.loc[(payment_applied_data['qbCustomerPaidById']!='6045') & (payment_applied_data['qbCustomerPaidById']!='1701')].copy()
     payment_applied_df[['orderNumber','Method_ID']] = payment_applied_df[['orderNumber','Method_ID']].astype(int)
     nabione_payments_df[['orderNumber','Method_ID']] = nabione_payments_df[['orderNumber','Method_ID']].astype(int)
 

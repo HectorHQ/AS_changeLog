@@ -545,8 +545,8 @@ else:
     csv_deductions = pending_deductions_df.to_csv().encode('utf-8')
 
     pending_deductions_df['eligbleAt'] = pd.to_datetime(pending_deductions_df['eligbleAt'])
-    pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].astype('int')
     pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].astype(str)
+    pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].str.replace('.0','')
     
     user_input_deductions = st.number_input('Index Number',min_value=0,value=0,key='deductions')
     pending_deductions_df = filter_dataframe(pending_deductions_df,key = 'filter_deductions')

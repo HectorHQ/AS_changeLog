@@ -617,9 +617,9 @@ else:
         rollback_df['appliedAt'] = pd.to_datetime(rollback_df['appliedAt'])
         rollback_df['paidAt'] = pd.to_datetime(rollback_df['paidAt'])
         rollback_df['createdat'] = pd.to_datetime(rollback_df['createdat'])
-        rollback_df
+        
         response = submit_rollback(rollback_df)
-        response
+        
         st.write('Request sent to Make automation, review google sheet below for JE logs')
         st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
     

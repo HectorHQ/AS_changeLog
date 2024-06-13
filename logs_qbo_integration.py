@@ -611,8 +611,8 @@ else:
     
     st.download_button('Download Rollback Data',data=csv_rollback,file_name='Rollback.csv',mime='text/csv')    
 
-    submit_rollback = st.button('Submit Rollback')
-    if submit_rollback:
+    submit_rollback_button = st.button('Submit Rollback')
+    if submit_rollback_button:
         rollback_df['rolledBackAt'] = pd.to_datetime(rollback_df['rolledBackAt'])
         rollback_df['appliedAt'] = pd.to_datetime(rollback_df['appliedAt'])
         rollback_df['paidAt'] = pd.to_datetime(rollback_df['paidAt'])

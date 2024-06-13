@@ -260,6 +260,19 @@ def submit_nabione(nabione_data):
 
 
 st.cache()
+def submit_rollback(rollback_data):
+    rollback_json = rollback_data.reset_index(names='Index_ID').to_json(orient='records', date_format='iso', date_unit='s')
+    data_json = {'data':rollback_json}
+    data_json_rollback = json.dumps(data_json)
+    webhook_rollback_nabifive = 'https://hook.us1.make.com/pirx5ednaa5kobx2rifg2d1pr5jlb7ly'
+    response = requests.post(webhook_rollback_nabifive,data=data_json_rollback,headers={'Content-Type': 'application/json'})
+    
+    return response
+
+
+
+
+st.cache()
 def filter_dataframe(df: pd.DataFrame,key) -> pd.DataFrame:
         """
         Adds a UI on top of a dataframe to let viewers filter columns
@@ -580,9 +593,32 @@ else:
 
     st.markdown('---')
     st.subheader(':orange[Rollback Report DataFrame]')
-    rollback_df
+    
     csv_rollback = rollback_df.to_csv().encode('utf-8')
+
+    user_input_rollback = st.number_input('Index Number',min_value=0,value=0,key='rollback')
+    rollback_df = filter_dataframe(rollback_df,key = 'filter_rollback')
+
+    
+    if int(user_input_rollback) == 0:
+        rollback_df
+    else:
+        index_rollback = int(user_input_rollback)
+        rollback_df = rollback_df[rollback_df.index.get_loc(index_rollback)+1:]
+        rollback_df    
+
+
+    
     st.download_button('Download Rollback Data',data=csv_rollback,file_name='Rollback.csv',mime='text/csv')    
+
+    submit_rollback = st.button('Submit Rollback')
+    if submit_rollback:
+        rollback_df['eligbleAt'] = pd.to_datetime(rollback_df['eligbleAt'])
+        rollback_df['createdat'] = pd.to_datetime(rollback_df['createdat'])
+        response = submit_rollback(rollback_df)
+        st.write('Request sent to Make automation, review google sheet below for JE logs')
+        st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')    
+    
 
     st.markdown('---')
     st.subheader(':orange[Remittances Report DataFrame]')

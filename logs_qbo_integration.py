@@ -613,7 +613,7 @@ else:
 
     submit_rollback = st.button('Submit Rollback')
     if submit_rollback:
-        rollback_df['rolledbackAt'] = pd.to_datetime(rollback_df['rolledbackAt'])
+        rollback_df['rolledBackAt'] = pd.to_datetime(rollback_df['rolledBackAt'])
         rollback_df['appliedAt'] = pd.to_datetime(rollback_df['appliedAt'])
         rollback_df['paidAt'] = pd.to_datetime(rollback_df['paidAt'])
         rollback_df['createdat'] = pd.to_datetime(rollback_df['createdat'])

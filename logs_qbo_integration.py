@@ -206,7 +206,7 @@ def pending_deductions(df_applications):
 
     manual_invs_deductions = pending_deductions_data.loc[pending_deductions_data['orderNumber'].isna()].copy()
     
-    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first','invoiceNumber':'first','invoiceName':'first','transactionNumber':'first'}).reset_index()
+    pending_deductions_data_grp = pending_deductions_data.groupby('orderNumber').agg({'amount':'sum','eligbleAt':'first','qbCustomerPaidById':'first','qbClassInvoiceBrandOrg':'first','qbCustomerPaidToId':'first','createdat':'first','changeTag':'first','invoiceNumber':'first','invoiceName':'first'}).reset_index()
     columns_names = pending_deductions_data_grp.columns.tolist()
 
     manual_invs_deductions = manual_invs_deductions[columns_names]
@@ -589,10 +589,10 @@ else:
 
     pending_deductions_df['eligbleAt'] = pd.to_datetime(pending_deductions_df['eligbleAt'])
     pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].apply(lambda x: remove_decimal(x))
-    pending_deductions_df['transactionNumber'] = pending_deductions_df['transactionNumber'].apply(lambda x: remove_decimal(x))
+    #pending_deductions_df['transactionNumber'] = pending_deductions_df['transactionNumber'].apply(lambda x: remove_decimal(x))
     pending_deductions_df['invoiceNumber'] = pending_deductions_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
     pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].astype(str)
-    pending_deductions_df['transactionNumber'] = pending_deductions_df['transactionNumber'].astype(str)
+    #pending_deductions_df['transactionNumber'] = pending_deductions_df['transactionNumber'].astype(str)
     pending_deductions_df['invoiceNumber'] = pending_deductions_df['invoiceNumber'].astype(str)
     
     

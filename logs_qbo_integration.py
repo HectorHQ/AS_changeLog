@@ -448,12 +448,12 @@ else:
     
 
     csv_payments = payment_creation_data.to_csv().encode('utf-8')
-    payment_creation_data['orderNumber'] = payment_creation_data['orderNumber'].apply(lambda x: remove_decimal(x))
+    #payment_creation_data['orderNumber'] = payment_creation_data['orderNumber'].apply(lambda x: remove_decimal(x))
     payment_creation_data['transactionNumber'] = payment_creation_data['transactionNumber'].apply(lambda x: remove_decimal(x))
-    payment_creation_data['invoiceNumber'] = payment_creation_data['invoiceNumber'].apply(lambda x: remove_decimal(x))
-    payment_creation_data['orderNumber'] = payment_creation_data['orderNumber'].astype(str)
+    #payment_creation_data['invoiceNumber'] = payment_creation_data['invoiceNumber'].apply(lambda x: remove_decimal(x))
+    #payment_creation_data['orderNumber'] = payment_creation_data['orderNumber'].astype(str)
     payment_creation_data['transactionNumber'] = payment_creation_data['transactionNumber'].astype(str)
-    payment_creation_data['invoiceNumber'] = payment_creation_data['invoiceNumber'].astype(str)
+    #payment_creation_data['invoiceNumber'] = payment_creation_data['invoiceNumber'].astype(str)
 
     user_input_creation = st.number_input('Index Number',min_value=0,value=0,key='pmt_creation')
 

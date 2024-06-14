@@ -479,7 +479,10 @@ else:
     
 
     csv_payments_applications = payments_application_data.to_csv().encode('utf-8')
-    
+    payments_application_data['orderNumber'] = payments_application_data['orderNumber'].apply(lambda x: remove_decimal(x))
+    payments_application_data['transactionNumber'] = payments_application_data['transactionNumber'].apply(lambda x: remove_decimal(x))
+    payments_application_data['orderNumber'] = payments_application_data['orderNumber'].astype(str)
+    payments_application_data['transactionNumber'] = payments_application_data['transactionNumber'].astype(str)
 
     st.text('Filter DataFrame If the app stops and the applications are incompleted, Pull the Index number from the google sheet available in Column called "Index_Dataframe"')
     user_input = st.number_input('Index Number',min_value=0,value=0,key='pmt_application')

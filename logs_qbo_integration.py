@@ -448,7 +448,12 @@ else:
     
 
     csv_payments = payment_creation_data.to_csv().encode('utf-8')
-    
+    payment_creation_data['orderNumber'] = payment_creation_data['orderNumber'].apply(lambda x: remove_decimal(x))
+    payment_creation_data['transactionNumber'] = payment_creation_data['transactionNumber'].apply(lambda x: remove_decimal(x))
+    payment_creation_data['invoiceNumber'] = payment_creation_data['invoiceNumber'].apply(lambda x: remove_decimal(x))
+    payment_creation_data['orderNumber'] = payment_creation_data['orderNumber'].astype(str)
+    payment_creation_data['transactionNumber'] = payment_creation_data['transactionNumber'].astype(str)
+    payment_creation_data['invoiceNumber'] = payment_creation_data['invoiceNumber'].astype(str)
 
     user_input_creation = st.number_input('Index Number',min_value=0,value=0,key='pmt_creation')
 
@@ -481,8 +486,11 @@ else:
     csv_payments_applications = payments_application_data.to_csv().encode('utf-8')
     payments_application_data['orderNumber'] = payments_application_data['orderNumber'].apply(lambda x: remove_decimal(x))
     payments_application_data['transactionNumber'] = payments_application_data['transactionNumber'].apply(lambda x: remove_decimal(x))
+    payments_application_data['invoiceNumber'] = payments_application_data['invoiceNumber'].apply(lambda x: remove_decimal(x))
     payments_application_data['orderNumber'] = payments_application_data['orderNumber'].astype(str)
     payments_application_data['transactionNumber'] = payments_application_data['transactionNumber'].astype(str)
+    payments_application_data['invoiceNumber'] = payments_application_data['invoiceNumber'].astype(str)
+    
 
     st.text('Filter DataFrame If the app stops and the applications are incompleted, Pull the Index number from the google sheet available in Column called "Index_Dataframe"')
     user_input = st.number_input('Index Number',min_value=0,value=0,key='pmt_application')
@@ -511,7 +519,12 @@ else:
     st.subheader(':orange[Nabione Payments Created, Dataframe]')
     
     csv_nabione = nabione_df.to_csv().encode('utf-8')
-    
+    nabione_df['orderNumber'] = nabione_df['orderNumber'].apply(lambda x: remove_decimal(x))
+    nabione_df['transactionNumber'] = nabione_df['transactionNumber'].apply(lambda x: remove_decimal(x))
+    nabione_df['invoiceNumber'] = nabione_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
+    nabione_df['orderNumber'] = nabione_df['orderNumber'].astype(str)
+    nabione_df['transactionNumber'] = nabione_df['transactionNumber'].astype(str)
+    nabione_df['invoiceNumber'] = nabione_df['invoiceNumber'].astype(str)
 
     user_input_nabione = st.number_input('Index Number',min_value=0,value=0,key='nabione')
     nabione_df = filter_dataframe(nabione_df,key='key_2')
@@ -540,7 +553,14 @@ else:
     st.subheader(':orange[Payments Applied to Manual invoices]')
     
     csv_payments_applications_noOrder = applied_noOrderProvided_data.to_csv().encode('utf-8')
+    applied_noOrderProvided_data['orderNumber'] = applied_noOrderProvided_data['orderNumber'].apply(lambda x: remove_decimal(x))
+    applied_noOrderProvided_data['transactionNumber'] = applied_noOrderProvided_data['transactionNumber'].apply(lambda x: remove_decimal(x))
+    applied_noOrderProvided_data['invoiceNumber'] = applied_noOrderProvided_data['invoiceNumber'].apply(lambda x: remove_decimal(x))
+    applied_noOrderProvided_data['orderNumber'] = applied_noOrderProvided_data['orderNumber'].astype(str)
+    applied_noOrderProvided_data['transactionNumber'] = applied_noOrderProvided_data['transactionNumber'].astype(str)
+    applied_noOrderProvided_data['invoiceNumber'] = applied_noOrderProvided_data['invoiceNumber'].astype(str)
 
+    
     user_input_noOrders = st.number_input('Index Number',min_value=0,value=0,key='noOrder')
     applied_noOrderProvided_data = filter_dataframe(applied_noOrderProvided_data,key = 'filter_Manuals')
   
@@ -569,7 +589,11 @@ else:
 
     pending_deductions_df['eligbleAt'] = pd.to_datetime(pending_deductions_df['eligbleAt'])
     pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].apply(lambda x: remove_decimal(x))
+    pending_deductions_df['transactionNumber'] = pending_deductions_df['transactionNumber'].apply(lambda x: remove_decimal(x))
+    pending_deductions_df['invoiceNumber'] = pending_deductions_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
     pending_deductions_df['orderNumber'] = pending_deductions_df['orderNumber'].astype(str)
+    pending_deductions_df['transactionNumber'] = pending_deductions_df['transactionNumber'].astype(str)
+    pending_deductions_df['invoiceNumber'] = pending_deductions_df['invoiceNumber'].astype(str)
     
     
     user_input_deductions = st.number_input('Index Number',min_value=0,value=0,key='deductions')
@@ -598,7 +622,14 @@ else:
     st.subheader(':orange[Rollback Report DataFrame]')
     
     csv_rollback = rollback_df.to_csv().encode('utf-8')
+    rollback_df['orderNumber'] = rollback_df['orderNumber'].apply(lambda x: remove_decimal(x))
+    rollback_df['transactionNumber'] = rollback_df['transactionNumber'].apply(lambda x: remove_decimal(x))
+    rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
+    rollback_df['orderNumber'] = rollback_df['orderNumber'].astype(str)
+    rollback_df['transactionNumber'] = rollback_df['transactionNumber'].astype(str)
+    rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].astype(str)
 
+    
     user_input_rollback = st.number_input('Index Number',min_value=0,value=0,key='rollback')
     rollback_df = filter_dataframe(rollback_df,key = 'filter_rollback')
 

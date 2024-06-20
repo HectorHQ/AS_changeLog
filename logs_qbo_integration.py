@@ -571,6 +571,8 @@ else:
         applied_noOrderProvided_data = applied_noOrderProvided_data[applied_noOrderProvided_data.index.get_loc(index_noOrders)+1:]
         applied_noOrderProvided_data
 
+
+    st.download_button('Download Payments Application No Orders Data',data=csv_payments_applications_noOrder,file_name='Payments_applications_noOrders.csv',mime='text/csv')
     submit_noOrders = st.button('Submit No orders applications')
     if submit_noOrders:
         applied_noOrderProvided_data['appliedAt'] = pd.to_datetime(applied_noOrderProvided_data['appliedAt'])
@@ -579,7 +581,7 @@ else:
         st.write('Request sent to Make automation, review google sheet below for JE logs')
         st.link_button('Go to Google Sheet','https://docs.google.com/spreadsheets/d/1yLJN4SqmoDd_7glsz6R01q6o5sHY8qjleqwp3e-o9Ns/edit#gid=0')  
 
-    st.download_button('Download Payments Application No Orders Data',data=csv_payments_applications_noOrder,file_name='Payments_applications_noOrders.csv',mime='text/csv')
+    
 
 
     st.markdown('---')

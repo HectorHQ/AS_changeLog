@@ -19,17 +19,15 @@ st.set_page_config('Accounting Services - QBO',
                     )
 
 st.title(':orange[AS - QBO] Automation Service :factory:')
-'''
-'T00:00:00-08:00'
-'''
+
 st.cache()
 def logs_AS_transactios(startDate,endDate,headers):
     json_data = {
         'operationName': 'getAccountingAPIFetchJournalsForDates',
         'variables': {
             'input': {
-                        'startDate': startDate + 'T20:59:59-08:00',
-                        'endDate': endDate + 'T22:59:59-08:00'
+                        'startDate': startDate + 'T00:00:00-08:00',
+                        'endDate': endDate + 'T23:59:59-08:00'
                 },
             },
         'query': 'query getAccountingAPIFetchJournalsForDates($input: FetchJournalsForDatesInput!) {\n  getAccountingAPIFetchJournalsForDates(input: $input) {\n    journals {\n      id\n      createdAt\n      updatedAt\n      deletedAt\n      notes\n      oldCustomDate\n      newCustomDate\n      orderNumber\n      data\n      changeTag\n      reportedCount\n    }\n  }\n}\n'

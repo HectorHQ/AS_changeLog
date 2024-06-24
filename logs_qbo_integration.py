@@ -29,7 +29,7 @@ def logs_AS_transactios(startDate,endDate,headers):
         'variables': {
             'input': {
                         'startDate': startDate + 'T20:59:59-08:00',
-                        'endDate': endDate + 'T23:59:59-08:00'
+                        'endDate': endDate + 'T22:59:59-08:00'
                 },
             },
         'query': 'query getAccountingAPIFetchJournalsForDates($input: FetchJournalsForDatesInput!) {\n  getAccountingAPIFetchJournalsForDates(input: $input) {\n    journals {\n      id\n      createdAt\n      updatedAt\n      deletedAt\n      notes\n      oldCustomDate\n      newCustomDate\n      orderNumber\n      data\n      changeTag\n      reportedCount\n    }\n  }\n}\n'

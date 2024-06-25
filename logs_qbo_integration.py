@@ -27,7 +27,7 @@ def logs_AS_transactios(startDate,endDate,headers):
         'variables': {
             'input': {
                         'startDate': startDate + 'T00:00:00-08:00',
-                        'endDate': endDate + 'T01:59:59-08:00'
+                        'endDate': endDate + 'T23:59:59-08:00'
                 },
             },
         'query': 'query getAccountingAPIFetchJournalsForDates($input: FetchJournalsForDatesInput!) {\n  getAccountingAPIFetchJournalsForDates(input: $input) {\n    journals {\n      id\n      createdAt\n      updatedAt\n      deletedAt\n      notes\n      oldCustomDate\n      newCustomDate\n      orderNumber\n      data\n      changeTag\n      reportedCount\n    }\n  }\n}\n'
@@ -428,7 +428,7 @@ else:
         
     
     as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
-    as_logs
+    
     st.cache_data()
     df_applications = creation_logs(as_logs)
     st.session_state['df_applications'] = df_applications

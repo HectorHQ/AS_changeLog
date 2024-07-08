@@ -622,15 +622,17 @@ else:
 
     st.markdown('---')
     st.subheader(':orange[Rollback Report DataFrame]')
-    
-    csv_rollback = rollback_df.to_csv().encode('utf-8')
-    rollback_df['orderNumber'] = rollback_df['orderNumber'].apply(lambda x: remove_decimal(x))
-    rollback_df['transactionNumber'] = rollback_df['transactionNumber'].apply(lambda x: remove_decimal(x))
-    rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
-    rollback_df['orderNumber'] = rollback_df['orderNumber'].astype(str)
-    rollback_df['transactionNumber'] = rollback_df['transactionNumber'].astype(str)
-    rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].astype(str)
 
+    if len(rollback_df) >0:
+        csv_rollback = rollback_df.to_csv().encode('utf-8')
+        rollback_df['orderNumber'] = rollback_df['orderNumber'].apply(lambda x: remove_decimal(x))
+        rollback_df['transactionNumber'] = rollback_df['transactionNumber'].apply(lambda x: remove_decimal(x))
+        rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
+        rollback_df['orderNumber'] = rollback_df['orderNumber'].astype(str)
+        rollback_df['transactionNumber'] = rollback_df['transactionNumber'].astype(str)
+        rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].astype(str)
+    else:
+        rollback_df
     
     user_input_rollback = st.number_input('Index Number',min_value=0,value=0,key='rollback')
     rollback_df = filter_dataframe(rollback_df,key = 'filter_rollback')

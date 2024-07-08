@@ -63,6 +63,7 @@ def payments_creation_logs(df_applications):
 
 
     payment_creation_data = pd.DataFrame(list_pmt_created)
+    payment_creation_data_meta = payment_creation_data.loc[payment_creation_data['changeTag'].str.contains('meta')]
     payment_creation_data = payment_creation_data.loc[~payment_creation_data['changeTag'].str.contains('meta')]
 
     payment_creation_data['bank_account'] = np.where(((payment_creation_data['method']=='CHECK') | (payment_creation_data['method']=='EFT') ) & (payment_creation_data['originCompany']=='NABITWO'), 473,
@@ -73,6 +74,13 @@ def payments_creation_logs(df_applications):
                                                                             np.where((payment_creation_data['method']=='CASH') & (payment_creation_data['location']=='CASH_IN_WOODLAKE'),486, np.nan
                                         ))))))
 
+    
+    dic_pmt_creation_meta = dict(zip(payment_creation_data_meta['originalName'],payment_creation_data_meta['paidAt']))    
+    payment_creation_data['paidAt'] = np.where(
+            payment_creation_data['originalName'].isin(dic_pmt_creation_meta.keys()),
+            payment_creation_data['originalName'].map(dic_pmt_creation_meta),
+            payment_creation_data['paidAt']
+    )
     
     payments_df = payment_creation_data.loc[(payment_creation_data['type']=='PAYMENT') & (payment_creation_data['qbCustomerPaidById']!='6045')]
     payments_df = payments_df.loc[(payments_df['type']=='PAYMENT') & (payments_df['qbCustomerPaidById']!='1701')]
@@ -92,6 +100,7 @@ def submit_payment_creation(df_to_submit):
     response = requests.post(webhook_pmt_creation_nabifive,data=data_json_pmts_creation,headers={'Content-Type': 'application/json'})
 
     return response
+
 
 st.cache()
 def payment_application_data(df_applications):

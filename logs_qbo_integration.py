@@ -633,6 +633,7 @@ else:
         rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].astype(str)
     else:
         rollback_df
+        csv_rollback = rollback_df.to_csv().encode('utf-8')
     
     user_input_rollback = st.number_input('Index Number',min_value=0,value=0,key='rollback')
     rollback_df = filter_dataframe(rollback_df,key = 'filter_rollback')

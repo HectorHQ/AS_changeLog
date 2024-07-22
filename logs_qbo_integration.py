@@ -432,7 +432,8 @@ else:
 
     st.cache_data()
     if 'headers' not in st.session_state:
-        headers = create_headers(token)
+        tokenRefresh = refreshToken(token)
+        headers = create_headers(tokenRefresh)
         st.session_state['headers'] = headers
     
     

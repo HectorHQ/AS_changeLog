@@ -437,7 +437,7 @@ else:
         
     
     as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
-    
+    as_logs
     st.cache_data()
     df_applications = creation_logs(as_logs)
     st.session_state['df_applications'] = df_applications

@@ -434,7 +434,7 @@ else:
     if 'headers' not in st.session_state:
         headers = create_headers(token)
         st.session_state['headers'] = headers
-        
+    token    
     headers
     as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
     as_logs

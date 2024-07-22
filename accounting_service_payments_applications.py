@@ -69,6 +69,7 @@ def refreshToken(token):
     response = requests.post('https://api.nabis.com/graphql/admin', headers=headers, json=json_data)
 
     data = response.json()
+    data = data['data']['refreshToken']['token']
     
     return data
 

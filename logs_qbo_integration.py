@@ -435,7 +435,7 @@ else:
         headers = create_headers(token)
         st.session_state['headers'] = headers
         
-    
+    headers
     as_logs = logs_AS_transactios(startDate,endDate,st.session_state['headers'])
     as_logs
     st.cache_data()

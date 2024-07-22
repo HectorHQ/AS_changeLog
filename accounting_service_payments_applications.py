@@ -56,7 +56,7 @@ def get_bearer_token(user,password):
 
 
 @st.cache_data
-def refreshToken(token):
+def refreshToken(token,headers):
     json_data = {
         'operationName': 'RefreshToken',
         'variables': {

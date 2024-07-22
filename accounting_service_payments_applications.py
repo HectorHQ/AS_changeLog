@@ -56,6 +56,24 @@ def get_bearer_token(user,password):
 
 
 @st.cache_data
+def refreshToken(token):
+    json_data = {
+        'operationName': 'RefreshToken',
+        'variables': {
+            'token': token,
+            'organizationId': 'T3JnYW5pemF0aW9uOjk2MGY0YjU2LWM1ZGItNDFkNi04MjRkLTg1NjNlOThkODUwZQ==',
+        },
+        'query': 'mutation RefreshToken($token: String!, $organizationId: String) {\n  refreshToken(token: $token, organizationId: $organizationId) {\n    token\n    __typename\n  }\n}\n',
+    }
+
+    response = requests.post('https://api.nabis.com/graphql/admin', headers=headers, json=json_data)
+
+    data = response.json()
+    
+    return data
+
+
+@st.cache_data
 def get_retailer_id(headers):
 
 

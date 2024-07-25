@@ -66,6 +66,13 @@ def payments_creation_logs(df_applications):
     payment_creation_data_meta = payment_creation_data.loc[payment_creation_data['changeTag'].str.contains('meta')]
     payment_creation_data = payment_creation_data.loc[~payment_creation_data['changeTag'].str.contains('meta')]
 
+    dic_pmt_creation_meta_company = dict(zip(payment_creation_data_meta['originalName'],payment_creation_data_meta['originCompany']))    
+    payment_creation_data['originCompany'] = np.where(
+            payment_creation_data['originalName'].isin(dic_pmt_creation_meta_company.keys()),
+            payment_creation_data['originalName'].map(dic_pmt_creation_meta_company),
+            payment_creation_data['originCompany']
+    )
+
     payment_creation_data['bank_account'] = np.where(((payment_creation_data['method']=='CHECK') | (payment_creation_data['method']=='EFT') ) & (payment_creation_data['originCompany']=='NABITWO'), 473,
                                         np.where((payment_creation_data['method']=='EFT') & (payment_creation_data['originCompany']=='NABIFIVE'),469,
                                                  np.where((payment_creation_data['method']=='CHECK') & (payment_creation_data['originCompany']=='NABIFIVE'),61,

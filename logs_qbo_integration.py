@@ -686,4 +686,15 @@ else:
     remittances_report
     csv_remittances = remittances_report.to_csv().encode('utf-8')
     st.download_button('Download Remittances Data',data=csv_remittances,file_name='Remittances.csv',mime='text/csv') 
+
+
+    st.markdown('---')
+    st.subheader(':orange[Write Off Report DataFrame]')
+    write_off_applied_data
+    csv_write_off = write_off_applied_data.to_csv().encode('utf-8')
+    st.download_button('Download Write Off Data',data=csv_write_off,file_name='Writeoff.csv',mime='text/csv') 
+
+
+
+
     

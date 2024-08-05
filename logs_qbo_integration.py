@@ -649,7 +649,8 @@ else:
         rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].apply(lambda x: remove_decimal(x))
         rollback_df['orderNumber'] = rollback_df['orderNumber'].astype(str)
         rollback_df['transactionNumber'] = rollback_df['transactionNumber'].astype(str)
-        rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].astype(str)
+        if 'invoiceNumber' in rollback_df.columns:
+            rollback_df['invoiceNumber'] = rollback_df['invoiceNumber'].astype(str)
     else:
         rollback_df
         csv_rollback = rollback_df.to_csv().encode('utf-8')
